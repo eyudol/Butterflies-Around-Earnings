@@ -4,7 +4,7 @@ method runs each ticker in separate process on a separate core. The process is n
 exactly proportionally to the number of workers because a large chunk of the total run-time
 is waiting for memory transfer, but it helps quite a lot. Also note that Dask is intentionally
 avoided here: I tried various configurations as well as various levels of inclusion of Dask in
-the script overall, and the current version is always the fastest.
+the functions overall, and the current version is always the fastest.
 """
 
 import pandas as pd
