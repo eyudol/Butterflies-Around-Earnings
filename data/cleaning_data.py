@@ -3,7 +3,7 @@ This script reads data that was provided by an options data vendor in CSV format
 cleans it and re-performs some calculations in a more accurate manner,
 and finally saves it to a parquet format with appropriate data types for
 efficient reading and memory use later on in the project. I would have preferred to
-use an even faster file format like feather but Dask annoying does not have support
+use an even faster file format like feather but Dask annoyingly does not have support
 for anything other than CSV and parquet.
 """
 
