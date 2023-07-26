@@ -1,10 +1,12 @@
 """
 Class for backtesting iron butterfly trading around earnings. Initializing the class
 automatically gathers most of the needed data for all the research methods to minimize
-passing of parameters and simplify the parallel backtesting. Noteable backtesting methods
-include 'calc_pnl', 'vol_changes', 'curve_changes' 'quality_of_fill', 'avg_exit_size_ratio'.
+passing of parameters and simplify the parallel backtesting (this sometimes gathers more 
+data than is needed but usually saves time). Noteable backtesting methods include 
+'calc_pnl', 'vol_changes', 'curve_changes' 'quality_of_fill', 'avg_exit_size_ratio'.
 See documentation of each for details.
 """
+
 import numpy as np
 import pandas as pd
 from typing import Callable
@@ -206,7 +208,6 @@ class ButterflyBacktester:
         :return:
             None, stores info to be used later.
         """
-
         # helper function for calculating intrinsic value of an option at a certain time
         def intrinsic_value(
                 row: pd.Series,
@@ -338,7 +339,7 @@ class ButterflyBacktester:
         return curvature
 
     @staticmethod
-    def __curve_calc_cont(df) -> float:
+    def __curve_calc_cont(df: pd.DataFrame) -> float:
         """
         Calculates curvature of vol smile of a particular option chain on a particular date using
         a continuous measure, specifically by measuring the value of the quadratic term when fitting a
@@ -444,9 +445,7 @@ class ButterflyBacktester:
             A positive value indicates that OTM vol increased relative to OTM vol, e.g. that
             fixed-strike vol-surface became steeper.
         """
-
-        # helper function to avoid redundancy in code, gets entry and exit values for
-        # ATM/OTM IV/Vega.
+        # helper function to avoid redundancy in code, gets entry and exit values for ATM/OTM IV/Vega.
         def get_entry_exit(option_type: str, field: str) -> tuple[float, float]:
             # check input values
             if option_type != 'ATM' and option_type != 'OTM':
@@ -478,25 +477,6 @@ class ButterflyBacktester:
         # Get average OTM vega
         otm_vega_entry, otm_vega_exit = get_entry_exit('OTM', 'Vega')
         avg_otm_vega: float = (otm_vega_entry + otm_vega_exit) / 2
-
-        # # determine change in ATM Vol
-        # atm_vol_entry = (self.contracts['ATM Put']['Entry IV'] + self.contracts['ATM Call']['Entry IV']) / 2
-        # atm_vol_exit = (self.contracts['ATM Put']['Exit IV'] + self.contracts['ATM Call']['Exit IV']) / 2
-        # atm_vol_change = atm_vol_exit - atm_vol_entry
-        #
-        # # determine change in OTM Vol
-        # otm_vol_entry = (self.contracts['OTM Put']['Entry IV'] + self.contracts['OTM Call']['Entry IV']) / 2
-        # otm_vol_exit = (self.contracts['OTM Put']['Exit IV'] + self.contracts['OTM Call']['Exit IV']) / 2
-        # otm_vol_change = otm_vol_exit - otm_vol_entry
-        #
-        # # determine the average vega
-        # atm_vega_entry = (self.contracts['ATM Put']['Entry Vega'] + self.contracts['ATM Call']['Entry Vega']) / 2
-        # atm_vega_exit = (self.contracts['ATM Put']['Exit Vega'] + self.contracts['ATM Call']['Exit Vega']) / 2
-        # avg_atm_vega = (atm_vega_entry + atm_vega_exit) / 2
-        #
-        # otm_vega_entry = (self.contracts['OTM Put']['Entry Vega'] + self.contracts['OTM Call']['Entry Vega']) / 2
-        # otm_vega_exit = (self.contracts['OTM Put']['Exit Vega'] + self.contracts['OTM Call']['Exit Vega']) / 2
-        # avg_otm_vega = (otm_vega_entry + otm_vega_exit) / 2
 
         # calculate the scaled difference
         scaled_diff: float = (otm_vol_change * avg_otm_vega) - (atm_vol_change * avg_atm_vega)
